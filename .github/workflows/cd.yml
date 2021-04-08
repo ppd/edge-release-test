@@ -27,7 +27,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Create New Edge Release
       id: create_release
-      uses: ppd/action-gh-release@master
+      uses: softprops/action-gh-release@master #ppd/action-gh-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
