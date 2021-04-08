@@ -14,6 +14,7 @@ jobs:
     if: always() && github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
+      outputs: ${{ toJson(steps.create_release.outputs) }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       html_url: ${{ steps.create_release.outputs.url }}
     steps:
@@ -51,9 +52,11 @@ jobs:
         event: ${{ toJson(github.event) }}
         edge_upload_url: ${{ needs.update_edge_release.outputs.upload_url }}
         edge_html_url: ${{ needs.update_edge_release.outputs.html_url }}
+        edge_outputs: ${{ needs.update_edge_release.outputs.outputs }}
       run: |
         echo "Upload url: $edge_upload_url"
         echo "Edge url: $edge_html_url"
+        echo "Outputs: $edge_outputs"
         if [ "$event_name" = "release" ]; then
           upload_url=$(echo "$event" | jq -r ".release.upload_url")
         else
