@@ -9,6 +9,15 @@ on:
       - created
 
 jobs:
+  cancel_previous_run:
+    name: Cancel previous workflow run
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.8.0
+      with:
+        access_token: ${{ github.token }}
   update_edge_release:
     name: Update Edge Release
     if: always() && github.event_name == 'push'
