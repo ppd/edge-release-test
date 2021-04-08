@@ -66,4 +66,5 @@ jobs:
         upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
         asset_path: version
         asset_name: version
+        asset_content_type: text/plain
    
