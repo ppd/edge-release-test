@@ -41,8 +41,6 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - name: Download All Workflow Artifacts
-      uses: actions/download-artifact@v2
     - name: Get Release Upload URL
       id: get_upload_url
       env:
@@ -50,6 +48,7 @@ jobs:
         event: ${{ toJson(github.event) }}
         edge_upload_url: ${{ needs.update_edge_release.outputs.upload_url }}
       run: |
+        echo "Event name: $event_name"
         if [ "$event_name" = "release" ]; then
           upload_url=$(echo "$event" | jq -r ".release.upload_url")
         else
