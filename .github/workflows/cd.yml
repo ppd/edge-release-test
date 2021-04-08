@@ -34,6 +34,12 @@ jobs:
         prerelease: true
         draft: false
         body: ${{ github.event.head_commit.message }}
+    - id: test
+      name: Test
+      env:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+      run: |
+        echo "Upload url: $upload_url"
 
   upload_release_assets:
     name: Upload Release Assets
@@ -49,6 +55,7 @@ jobs:
         edge_upload_url: ${{ needs.update_edge_release.outputs.upload_url }}
       run: |
         echo "Event name: $event_name"
+        echo "Edge upload url: $edge_upload_url"
         if [ "$event_name" = "release" ]; then
           upload_url=$(echo "$event" | jq -r ".release.upload_url")
         else
