@@ -17,9 +17,10 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
     - name: Delete Old Edge Release
-      uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      uses: ppd/delete-tag-and-release@master
       with:
         delete_release: true
+        delete_draft_release: true
         tag_name: edge
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
