@@ -1,0 +1,69 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - master
+  release:
+    types:
+      - created
+
+jobs:
+  update_edge_release:
+    name: Update Edge Release
+    if: always() && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Delete Old Edge Release
+      uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      with:
+        delete_release: true
+        tag_name: edge
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create New Edge Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: edge
+        name: Edge
+        prerelease: true
+        draft: false
+        body: ${{ github.event.head_commit.message }}
+
+  upload_release_assets:
+    name: Upload Release Assets
+    needs: [update_edge_release]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download All Workflow Artifacts
+      uses: actions/download-artifact@v2
+    - name: Get Release Upload URL
+      id: get_upload_url
+      env:
+        event_name: ${{ github.event_name }}
+        event: ${{ toJson(github.event) }}
+        edge_upload_url: ${{ needs.update_edge_release.outputs.upload_url }}
+      run: |
+        if [ "$event_name" = "release" ]; then
+          upload_url=$(echo "$event" | jq -r ".release.upload_url")
+        else
+          upload_url="$edge_upload_url"
+        fi
+        echo "::set-output name=upload_url::$upload_url"
+        echo "Upload URL: $upload_url"
+    - name: Upload version
+      uses: actions/upload-release-asset@v1
+      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+        asset_path: version
+        asset_name: version
+   
